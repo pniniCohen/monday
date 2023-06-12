@@ -1,0 +1,19 @@
+.table{
+    margin: auto;
+    width: 60% !important;
+}
+.work{
+    margin: auto !important;
+}
+.toSend{
+    margin-top: 3% !important;
+}
+.all{
+    margin: auto !important;
+    text-align: center;
+}
+.dateCheck{
+    text-align: center !important;
+    margin-left: 70% !important;
+    margin-bottom: 2% !important;
+}
