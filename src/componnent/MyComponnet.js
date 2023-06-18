@@ -9,7 +9,6 @@ import { useEffect, useState } from 'react';
 
 
 const imageUrl = process.env.PUBLIC_URL + '/irox.png';
-const teamLeader = ['חיה', 'מלכי', 'שולמית', 'ציפי'];
 
 
 const MyComponnet = () => {
@@ -30,23 +29,6 @@ const fetchData =  () => {
   }
 };
 
-// useEffect(() => {
-//   fetchData();
-//   const query = '{items_by_column_values(board_id:1493172994,column_id:"text82",column_value:"306" ){id,name  column_values(ids:[text0, __]){id text}}}';
-
-//   fetch("https://api.monday.com/v2", {
-//     method: 'post',
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'Authorization': apiKey
-//     },
-//     body: JSON.stringify({
-//       'query': query
-//     })
-//   })
-//     .then(res => res.json())
-//     .then(res => console.log(JSON.stringify(res, null, 2)));
-// }, []);
 
 useEffect(() => {
 
