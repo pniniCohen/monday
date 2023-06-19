@@ -25,8 +25,8 @@ import MenuItem from '@mui/material/MenuItem';
 const imageUrl = process.env.PUBLIC_URL + '/irox.png';
 const absenceBoard = 4641194243;//temp duplicate2 Board  3717736532;
 
-const presence_options = ['הגיעה','יום רביעי - חוץ לעיר', 'חסרה עם אישור', 'חסרה ללא אישור', 'לא עובדת היום'];
-
+// const presence_options = ['הגיעה','יום רביעי - חוץ לעיר', 'חסרה עם אישור', 'חסרה ללא אישור', 'לא עובדת היום'];
+let presence_options=[];
 
 export default function TableData() {
 
@@ -78,6 +78,7 @@ export default function TableData() {
                 if (apiKey != "") {
                     console.log("before loadTeamData:" + apiKey);
                     loadTeamData();
+                    loadPresenceOptions();
                 }
             })();
     }, [selectedDate]);
@@ -92,18 +93,12 @@ export default function TableData() {
                 if (resJson.data !== undefined) {
                     let labels = JSON.parse(resJson.data.boards[0].columns[0].settings_str).labels;
                     console.log("labels:" + JSON.stringify(labels, null, 2));
-                    let options=[];
-                    
-                    
-                    // .forEach((element) => {
-                        // newRows.push({
-                        //     id: element.id
-                        //     , name: element.column_values.filter(a => a.id == "dropdown9")[0].text
-                        //     , presence: element.column_values.filter(a => a.id == "status")[0].text
-                        //     , absenceReason: element.column_values.filter(a => a.id == "text")[0].text
-                        // });
-                        console.log("element:" + labels.headers);
-                    //});
+                     presence_options = Object.entries(labels).map(([key, value]) => ({
+                        id: key,
+                        label: value
+                      }));
+                      
+                      console.log(presence_options);
                 }
 
                 return resJson;
@@ -188,9 +183,9 @@ export default function TableData() {
         <div className='all'>
             <div>
                 <img src={imageUrl} alt={`תמונה `} />
-                <h2>דוח הגעה שני ורביעי</h2>
+                <h1>דוח הגעה שני ורביעי</h1>
             </div>
-            <label>{state.teamLeaderName}</label>
+            <h2>{state.teamLeaderName}</h2>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={['DatePicker']}>
                     <DatePicker
@@ -206,8 +201,7 @@ export default function TableData() {
                 <Table dir="rtl" sx={{ minWidth: 50 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>שם</TableCell>
-                            {/* <TableCell align="center">נוכחות באירוקס</TableCell> */}
+                            <TableCell align="right">שם</TableCell>
                             <TableCell align="center">נוכחות</TableCell>
                             <TableCell className='three' align="center">סיבת חיסור/הערות</TableCell>
                         </TableRow>
@@ -219,25 +213,26 @@ export default function TableData() {
                                 key={row.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                <TableCell component="th" scope="row">
+                                <TableCell align="right" component="th" scope="row">
                                     {row.name}
                                 </TableCell>
                                 <TableCell align="center">
                                     <Select
                                         sx={{ width: 160 }}
+                                        label="נוכחות"
                                         labelId="demo-simple-select-label"
                                         id="demo-simple-select"
                                         defaultValue={row.presence}
-                                        label="נוכחות"
                                         onChange={(e) => {
                                             const newValue = e.target.value;
                                             console.log(newValue);
                                             row.presence = newValue;
+                                            row.dirty = true; 
                                         }}
                                     >
                                         {presence_options.map((option) => (
-                                            <MenuItem key={option} value={option}>
-                                                {option}
+                                            <MenuItem key={option.id} value={option.label}>
+                                                {option.label}
                                             </MenuItem>
                                         ))}
                                     </Select>                                   
@@ -251,6 +246,7 @@ export default function TableData() {
                                             const newValue = e.target.value;
                                             console.log(newValue);
                                             row.absenceReason = newValue;
+                                            row.dirty = true;
                                         }}
 
                                     >
@@ -264,7 +260,7 @@ export default function TableData() {
 
             <Button className='toSend' onClick={save} variant="contained">שמירה</Button>
             
-            <Button className='toSend' onClick={loadPresenceOptions} variant="contained">זמני טען אופציות נוכחות</Button>
+            {/* <Button className='toSend' onClick={loadPresenceOptions} variant="contained">זמני טען אופציות נוכחות</Button> */}
             {/* <Select
                                         sx={{ width: 160 }}
                                         labelId="demo-simple-select-label"
