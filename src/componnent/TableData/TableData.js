@@ -7,9 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
 import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
 import './TableData.css';
 import Button from '@mui/material/Button';
 import { Await, useLocation } from 'react-router-dom';
@@ -18,7 +16,6 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import axios from 'axios';
-import { green } from '@mui/material/colors';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
@@ -26,22 +23,21 @@ const imageUrl = process.env.PUBLIC_URL + '/irox.png';
 const absenceBoard = 4641194243;//temp duplicate2 Board  3717736532;
 
 // const presence_options = ['הגיעה','יום רביעי - חוץ לעיר', 'חסרה עם אישור', 'חסרה ללא אישור', 'לא עובדת היום'];
-let presence_options=[];
+let presence_options = [];
 
 export default function TableData() {
 
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(new Date());//.toLocaleDateString('en-US'));
+
     const [tableRows, setTableRows] = useState([]);
     const handleDateChange = (date) => {
-        console.log(date);
+        console.log("date:"+date);
         setSelectedDate(date);
     };
-
     const { state } = useLocation();
     console.log(state.teamLeaderName);
 
     const [apiKey, setApiKey] = useState('');
-    const [temp_presence_options, setTempOptions] = useState([]);
 
     const fetchData = async () => {
         try {
@@ -63,84 +59,73 @@ export default function TableData() {
             })();
     }, []);
 
-    // useEffect(() => {
-    //     (
-    //         async () => {
-    //             await loadPresenceOptions();
-    //             console.log(presence_options);
-    //         })();
-    // }, [apiKey]);
+    useEffect(() => {
+        (
+            async () => {
+                if (apiKey != '') {
+                    await loadPresenceOptions();
+                    console.log(presence_options);
+                }
+            })();
+    }, [apiKey]);
 
     useEffect(() => {
         (
             async () => {
-                console.log(selectedDate);
+                console.log("selectedDate: "+ selectedDate);
                 if (apiKey != "") {
                     console.log("before loadTeamData:" + apiKey);
                     loadTeamData();
-                    loadPresenceOptions();
+                    //loadPresenceOptions();
                 }
             })();
     }, [selectedDate]);
 
     const loadPresenceOptions = async () => {
-        
         const query = '{ boards (ids:' + absenceBoard + ') { columns(ids:[status]) { title settings_str } } }'
         console.log("!!loadPresenceOptions query:" + query);
         requestMonday(query)
-             .then(resJson => {
-                let options = [];
+            .then(resJson => {
                 if (resJson.data !== undefined) {
-                    let labels = JSON.parse(resJson.data.boards[0].columns[0].settings_str).labels;
-                    console.log("labels:" + JSON.stringify(labels, null, 2));
-                     presence_options = Object.entries(labels).map(([key, value]) => ({
+                    let settingsJson = JSON.parse(resJson.data.boards[0].columns[0].settings_str);
+                    let optPosVal = Object.values(settingsJson.labels_positions_v2);
+                    presence_options = Object.entries(settingsJson.labels).map(([key, value]) => ({
                         id: key,
                         label: value
-                      }));
-                      
-                      console.log(presence_options);
+                    })).sort((a, b) => optPosVal[a.id] - optPosVal[b.id]);//set options position as in monday
+                    console.log(presence_options);
                 }
-
+                console.log(JSON.stringify(resJson, null, 2));
                 return resJson;
             })
-            .then(resJson => {
-                console.log(JSON.stringify(resJson, null, 2));
-                //setTableRows(resJson);
-            });
-  
-       
     };
 
     const loadTeamData = () => {
-        const query = '{ items_by_column_values(board_id:' + absenceBoard + ', column_id: date4, column_value:"' + getFormattedDate(selectedDate) + '") {id column_values { id title value text } } }';
+        const query = '{ items_by_column_values(board_id:' + absenceBoard + ', column_id: date4, column_value:"' + getFormattedDate(selectedDate) + '") {id column_values { id  text } } }';//title value
         console.log("query:" + query);
         requestMonday(query)
             .then(resJson => {
-                let newRows = [];
                 if (resJson.data !== undefined) {
                     let filteredRows = resJson.data.items_by_column_values.filter(x => x.column_values.some(y => y.id == "dropdown" && y.text == state.teamLeaderName));
-                    console.log("filteredRows:" + JSON.stringify(filteredRows, null, 2));
-
-                    filteredRows.forEach((element) => {
-                        newRows.push({
-                            id: element.id
-                            , name: element.column_values.filter(a => a.id == "dropdown9")[0].text
-                            , presence: element.column_values.filter(a => a.id == "status")[0].text
-                            , absenceReason: element.column_values.filter(a => a.id == "text")[0].text
-                        });
-                    });
+                    setTableRows(filteredRows.map((row) => ({
+                        id: row.id
+                        , name: row.column_values.filter(a => a.id == "dropdown9")[0].text
+                        , presence: row.column_values.filter(a => a.id == "status")[0].text
+                        , absenceReason: row.column_values.filter(a => a.id == "text")[0].text
+                        , dirty: false
+                    })));
                 }
-
-                return newRows;
+                else {
+                    setTableRows([]);
+                }
             })
-            .then(resJson => {
-                console.log(JSON.stringify(resJson, null, 2));
-                setTableRows(resJson);
-            });
+        // .then(resJson => {
+        //     console.log(JSON.stringify(resJson, null, 2));
+        //     setTableRows(resJson);
+        // });
     };
 
-    const getFormattedDate = (date)=>
-    {
+    const getFormattedDate = (date) => {
         return new Date(date).toLocaleDateString('en-GB', {
             year: 'numeric',
             month: '2-digit',
@@ -163,19 +148,23 @@ export default function TableData() {
     };
 
     const save = () => {
+        let saved = false;
         console.log(JSON.stringify(tableRows, null, 2));
         const formattedToday = getFormattedDate(new Date());
-         for (let index = 0; index < tableRows.length; index++) {
+        for (let index = 0; index < tableRows.length; index++) {
             const row = tableRows[index];
-            const query = //'mutation { change_simple_column_value(item_id:'+row.id+', board_id:'+absenceBoard+', column_id: "status", value: "'+ row.presence +'", create_labels_if_missing: true) { id } }'
-                          'mutation{change_multiple_column_values(board_id:'+absenceBoard+', item_id:'+row.id+',column_values: "{\\"status\\": \\"'+ row.presence +'\\", \\"text\\": \\"'+ row.absenceReason +'\\",\\"date\\": \\"'+ formattedToday +'\\" }" ) { id }}';
-            requestMonday(query)
-                .then(resJson => {
-                    console.log(JSON.stringify(resJson, null, 2));
-                });
-    
+            if (row.dirty) {
+                const query = 'mutation{change_multiple_column_values(board_id:' + absenceBoard + ', item_id:' + row.id + ',column_values: "{\\"status\\": \\"' + row.presence + '\\", \\"text\\": \\"' + row.absenceReason + '\\",\\"date\\": \\"' + formattedToday + '\\" }" ) { id }}';
+                requestMonday(query)
+                    .then(resJson => {
+                        console.log(JSON.stringify(resJson, null, 2));
+                    });
+                saved = true;
+                row.dirty = false;
+            }
         }
-        alert('הנתונים נשמרו בהצלחה');
+        if (saved)
+            alert('הנתונים נשמרו בהצלחה');
     };
 
 
@@ -193,7 +182,8 @@ export default function TableData() {
                         //defaultValue={selectedDate}
                         onChange={handleDateChange}
                         startDate={selectedDate}
-                        label='תאריך דו"ח'
+                        label='תאריך דו"ח'                        
+                       //dateFormat='DD/MM/YYYY'
                     />
                 </DemoContainer>
             </LocalizationProvider>
@@ -209,33 +199,31 @@ export default function TableData() {
                     <TableBody>
                         {tableRows.map((row) => (
                             <TableRow
-                                // key={row.name}
                                 key={row.id}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
                                 <TableCell align="right" component="th" scope="row">
                                     {row.name}
                                 </TableCell>
-                                <TableCell align="center">
+                                <TableCell align="center">                                    
                                     <Select
                                         sx={{ width: 160 }}
                                         label="נוכחות"
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
                                         defaultValue={row.presence}
                                         onChange={(e) => {
                                             const newValue = e.target.value;
                                             console.log(newValue);
                                             row.presence = newValue;
-                                            row.dirty = true; 
+                                            row.dirty = true;
                                         }}
+                                        display= "true"
                                     >
                                         {presence_options.map((option) => (
                                             <MenuItem key={option.id} value={option.label}>
                                                 {option.label}
                                             </MenuItem>
                                         ))}
-                                    </Select>                                   
+                                    </Select>
                                 </TableCell>
                                 <TableCell align="center" scope="row">
                                     <TextField
@@ -248,7 +236,6 @@ export default function TableData() {
                                             row.absenceReason = newValue;
                                             row.dirty = true;
                                         }}
-
                                     >
                                     </TextField>
                                 </TableCell>
@@ -256,10 +243,9 @@ export default function TableData() {
                         ))}
                     </TableBody>
                 </Table>
-            </TableContainer> {/* onChange={(e) => { onStatusChange(e) }} value={status} itemTemplate={statusTemplate} disabled={!driveInfo || !props.selectedPn} optionLabel="value" */}
-
+            </TableContainer>
             <Button className='toSend' onClick={save} variant="contained">שמירה</Button>
-            
+
             {/* <Button className='toSend' onClick={loadPresenceOptions} variant="contained">זמני טען אופציות נוכחות</Button> */}
             {/* <Select
                                         sx={{ width: 160 }}
@@ -267,6 +253,7 @@ export default function TableData() {
                                         id="demo-simple-select"
                                         defaultValue={row.presence}
                                         label="נוכחות"
+                                        optionLabel= "נוכחות"
                                         onChange={(e) => {
                                             const newValue = e.target.value;
                                             console.log(newValue);
