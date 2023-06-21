@@ -20,11 +20,14 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import dayjs from "dayjs";
 import { BoxLoading } from 'react-loadingg';
+import ReactLoading from 'react-loadingg';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+
 
 const imageUrl = process.env.PUBLIC_URL + '/irox.png';
 const absenceBoard = 4641194243;//temp duplicate2 Board  3717736532;
 
-// const presence_options = ['הגיעה','יום רביעי - חוץ לעיר', 'חסרה עם אישור', 'חסרה ללא אישור', 'לא עובדת היום'];
 let presence_options = [];
 
 export default function TableData() {
@@ -212,7 +215,7 @@ export default function TableData() {
                                     {row.name}
                                 </TableCell>
                                 <TableCell align="center">                                    
-                                    <Select
+                                    {/* <Select
                                         sx={{ width: 160 }}
                                         label="נוכחות"
                                         defaultValue={row.presence}
@@ -229,7 +232,29 @@ export default function TableData() {
                                                 {option.label}
                                             </MenuItem>
                                         ))}
-                                    </Select>
+                                    </Select> */}
+                                     <FormControl fullWidth>
+                                        <InputLabel id="demo-simple-select-label">נוכחות</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            label="נוכחות"
+                                            defaultValue={row.presence}
+                                            onChange={(e) => {
+                                                const newValue = e.target.value;
+                                                console.log(newValue);
+                                                row.presence = newValue;
+                                                row.dirty = true;
+                                            }}
+                                        >
+                                            {presence_options.map((option) => (
+                                                <MenuItem key={option.id} value={option.label}>
+                                                    {option.label}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+
                                 </TableCell>
                                 <TableCell align="center" scope="row">
                                     <TextField

@@ -14,11 +14,11 @@ import dayjs from "dayjs";
 
 const Login = () => {
 
+  const navigate = useNavigate();
   const [employeeNumber, setEmployeeNumber] = useState('');
   const [id, setId] = useState('');
-  const navigate = useNavigate();
   const [apiKey, setApiKey] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [reportDate, setReportDate] = useState(new Date());
 
 
 
@@ -35,7 +35,11 @@ const Login = () => {
   };
 
   useEffect(() => {
-    fetchData()
+    fetchData();
+    const urlParams = new URLSearchParams(window.location.search);
+    const dateParam = urlParams.get('reportDate');
+    if (dateParam) 
+    setReportDate(dateParam);
   }, []);
 
   const handleClick = () => {
@@ -52,7 +56,7 @@ const Login = () => {
           if (//temp removed : resJson.data.items_by_column_values.some(x => x.column_values.some(y=> y.id=="text0" && y.text== id)) &&
             resJson.data.items_by_column_values.some(x => x.column_values.some(y => y.id == "__" && (y.text == "רכזת" || y.text == "ראש צוות"))))//;
           {
-            navigate('/tableData', { state: { teamLeaderName: resJson.data.items_by_column_values[0].name, dateReport: selectedDate } });
+            navigate('/tableData', { state: { teamLeaderName: resJson.data.items_by_column_values[0].name, reportDate: reportDate } });
           }
           else {
             alert('לא נמצאו נתונים מתאימים');
@@ -78,19 +82,19 @@ const Login = () => {
 
   const handleDateChange = (date) => {
     console.log(date);
-    setSelectedDate(new Date(date));
+    setReportDate(new Date(date));
   };
 
   return (
     <div>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <LocalizationProvider  dateAdapter={AdapterDayjs}>
         <DemoContainer components={['DatePicker']}>
           <DatePicker
             className="dateCheck"
-            defaultValue={dayjs(selectedDate)}
+            defaultValue={dayjs(reportDate)}
             onChange={handleDateChange}
-            value={dayjs(selectedDate)}
-            // startDate={selectedDate}
+            value={dayjs(reportDate)}
+            // startDate={reportDate}
             label='תאריך דו"ח'
           />
         </DemoContainer>
