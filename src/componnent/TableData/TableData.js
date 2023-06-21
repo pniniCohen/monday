@@ -18,6 +18,8 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import axios from 'axios';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import dayjs from "dayjs";
+import { BoxLoading } from 'react-loadingg';
 
 const imageUrl = process.env.PUBLIC_URL + '/irox.png';
 const absenceBoard = 4641194243;//temp duplicate2 Board  3717736532;
@@ -27,14 +29,14 @@ let presence_options = [];
 
 export default function TableData() {
 
-    const [selectedDate, setSelectedDate] = useState(new Date());//.toLocaleDateString('en-US'));
-
+    const { state } = useLocation();
+    const [selectedDate, setSelectedDate] = useState(state.reportDate);//new Date("2023-06-01");//.toLocaleDateString('en-US'));
+    const [loading, setLoading] = useState(false);
     const [tableRows, setTableRows] = useState([]);
     const handleDateChange = (date) => {
         console.log("date:"+date);
         setSelectedDate(date);
     };
-    const { state } = useLocation();
     console.log(state.teamLeaderName);
 
     const [apiKey, setApiKey] = useState('');
@@ -54,6 +56,7 @@ export default function TableData() {
     useEffect(() => {
         (
             async () => {
+                setLoading(true);            
                 await fetchData();
                 console.log(apiKey);
             })();
@@ -63,8 +66,11 @@ export default function TableData() {
         (
             async () => {
                 if (apiKey != '') {
+                    setLoading(true);
                     await loadPresenceOptions();
                     console.log(presence_options);
+                    if (selectedDate != null)
+                        loadTeamData();
                 }
             })();
     }, [apiKey]);
@@ -74,9 +80,9 @@ export default function TableData() {
             async () => {
                 console.log("selectedDate: "+ selectedDate);
                 if (apiKey != "") {
+                    setLoading(true);
                     console.log("before loadTeamData:" + apiKey);
                     loadTeamData();
-                    //loadPresenceOptions();
                 }
             })();
     }, [selectedDate]);
@@ -114,6 +120,7 @@ export default function TableData() {
                         , absenceReason: row.column_values.filter(a => a.id == "text")[0].text
                         , dirty: false
                     })));
+                    setLoading(false);
                 }
                 else {
                     setTableRows([]);
@@ -175,19 +182,18 @@ export default function TableData() {
                 <h1>דוח הגעה שני ורביעי</h1>
             </div>
             <h2>{state.teamLeaderName}</h2>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}> 
                 <DemoContainer components={['DatePicker']}>
                     <DatePicker
                         className="dateCheck"
-                        //defaultValue={selectedDate}
                         onChange={handleDateChange}
-                        startDate={selectedDate}
-                        label='תאריך דו"ח'                        
-                       //dateFormat='DD/MM/YYYY'
+                        label='תאריך דו"ח' 
+                        defaultValue={dayjs(selectedDate)}   
                     />
-                </DemoContainer>
+               </DemoContainer>
             </LocalizationProvider>
-            <TableContainer component={Paper} className='table'>
+            {loading ? <BoxLoading /> :
+            <div><TableContainer component={Paper} className='table'>
                 <Table dir="rtl" sx={{ minWidth: 50 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
@@ -243,29 +249,9 @@ export default function TableData() {
                         ))}
                     </TableBody>
                 </Table>
-            </TableContainer>
+            </TableContainer>            
             <Button className='toSend' onClick={save} variant="contained">שמירה</Button>
-
-            {/* <Button className='toSend' onClick={loadPresenceOptions} variant="contained">זמני טען אופציות נוכחות</Button> */}
-            {/* <Select
-                                        sx={{ width: 160 }}
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        defaultValue={row.presence}
-                                        label="נוכחות"
-                                        optionLabel= "נוכחות"
-                                        onChange={(e) => {
-                                            const newValue = e.target.value;
-                                            console.log(newValue);
-                                            row.presence = newValue;
-                                        }}
-                                    >
-                                        {presence_options.map((option) => (
-                                            <MenuItem key={option} value={option}>
-                                                {option}
-                                            </MenuItem>
-                                        ))}
-            </Select>        */}
+            </div>}
         </div>
     );
 }
