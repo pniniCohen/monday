@@ -10,17 +10,17 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import './TableData.css';
 import Button from '@mui/material/Button';
-import { Await, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import axios from 'axios';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';//, { SelectChangeEvent }
 import MenuItem from '@mui/material/MenuItem';
 import dayjs from "dayjs";
 import { BoxLoading } from 'react-loadingg';
-import ReactLoading from 'react-loadingg';
+//import ReactLoading from 'react-loadingg';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 
@@ -33,7 +33,7 @@ let presence_options = [];
 export default function TableData() {
 
     const { state } = useLocation();
-    const [selectedDate, setSelectedDate] = useState(state.reportDate);//new Date("2023-06-01");//.toLocaleDateString('en-US'));
+    const [selectedDate, setSelectedDate] = useState(state.reportDate);
     const [loading, setLoading] = useState(false);
     const [tableRows, setTableRows] = useState([]);
     const handleDateChange = (date) => {
@@ -63,33 +63,37 @@ export default function TableData() {
                 await fetchData();
                 console.log(apiKey);
             })();
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
         (
             async () => {
-                if (apiKey != '') {
+                if (apiKey !== '') {
                     setLoading(true);
                     await loadPresenceOptions();
                     console.log(presence_options);
-                    if (selectedDate != null)
+                    if (selectedDate !== null)
                         loadTeamData();
                 }
             })();
+        // eslint-disable-next-line
     }, [apiKey]);
 
     useEffect(() => {
         (
             async () => {
                 console.log("selectedDate: "+ selectedDate);
-                if (apiKey != "") {
+                if (apiKey !== "") {
                     setLoading(true);
                     console.log("before loadTeamData:" + apiKey);
                     loadTeamData();
                 }
             })();
+        // eslint-disable-next-line
     }, [selectedDate]);
 
+    //טעינת האופציות עבור שדה נוכחות
     const loadPresenceOptions = async () => {
         const query = '{ boards (ids:' + absenceBoard + ') { columns(ids:[status]) { title settings_str } } }'
         console.log("!!loadPresenceOptions query:" + query);
@@ -109,18 +113,19 @@ export default function TableData() {
             })
     };
 
+    //טעינת רשומות הצוות לתאריך הנבחר
     const loadTeamData = () => {
         const query = '{ items_by_column_values(board_id:' + absenceBoard + ', column_id: date4, column_value:"' + getFormattedDate(selectedDate) + '") {id column_values { id  text } } }';//title value
         console.log("query:" + query);
         requestMonday(query)
             .then(resJson => {
                 if (resJson.data !== undefined) {
-                    let filteredRows = resJson.data.items_by_column_values.filter(x => x.column_values.some(y => y.id == "dropdown" && y.text == state.teamLeaderName));
+                    let filteredRows = resJson.data.items_by_column_values.filter(x => x.column_values.some(y => y.id === "dropdown" && y.text === state.teamLeaderName));
                     setTableRows(filteredRows.map((row) => ({
                         id: row.id
-                        , name: row.column_values.filter(a => a.id == "dropdown9")[0].text
-                        , presence: row.column_values.filter(a => a.id == "status")[0].text
-                        , absenceReason: row.column_values.filter(a => a.id == "text")[0].text
+                        , name: row.column_values.filter(a => a.id === "dropdown9")[0].text
+                        , presence: row.column_values.filter(a => a.id === "status")[0].text
+                        , absenceReason: row.column_values.filter(a => a.id === "text")[0].text
                         , dirty: false
                     })));
                     setLoading(false);
@@ -157,6 +162,7 @@ export default function TableData() {
             .then(res => res.json())
     };
 
+    //שמירת הרשומות שנעשה בהן שינוי ל Monday
     const save = () => {
         let saved = false;
         console.log(JSON.stringify(tableRows, null, 2));
@@ -215,25 +221,7 @@ export default function TableData() {
                                     {row.name}
                                 </TableCell>
                                 <TableCell align="center">                                    
-                                    {/* <Select
-                                        sx={{ width: 160 }}
-                                        label="נוכחות"
-                                        defaultValue={row.presence}
-                                        onChange={(e) => {
-                                            const newValue = e.target.value;
-                                            console.log(newValue);
-                                            row.presence = newValue;
-                                            row.dirty = true;
-                                        }}
-                                        display= "true"
-                                    >
-                                        {presence_options.map((option) => (
-                                            <MenuItem key={option.id} value={option.label}>
-                                                {option.label}
-                                            </MenuItem>
-                                        ))}
-                                    </Select> */}
-                                     <FormControl fullWidth>
+                                    <FormControl fullWidth>
                                         <InputLabel id="demo-simple-select-label">נוכחות</InputLabel>
                                         <Select
                                             labelId="demo-simple-select-label"
@@ -254,7 +242,6 @@ export default function TableData() {
                                             ))}
                                         </Select>
                                     </FormControl>
-
                                 </TableCell>
                                 <TableCell align="center" scope="row">
                                     <TextField

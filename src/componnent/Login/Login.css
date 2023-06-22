@@ -1,12 +1,13 @@
-.text{
-    margin-top: 3% !important;
-}
-.login{
-    margin-top: 3% !important;
-  
-}
 .dateCheck{
     text-align: center !important;
     width: 12%;
     margin:auto !important;
+}
+
+.text{
+    margin-top: 3% !important;
+}
+
+.login{
+    margin-top: 3% !important;  
 }
