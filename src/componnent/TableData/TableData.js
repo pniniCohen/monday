@@ -26,18 +26,17 @@ import FormControl from '@mui/material/FormControl';
 
 
 const imageUrl = process.env.PUBLIC_URL + '/irox.png';
-const absenceBoard = 4641194243;//temp duplicate2 Board  3717736532;
-
+const absenceBoard = 4641194243;
 let presence_options = [];
 
 export default function TableData() {
 
     const { state } = useLocation();
-    const [selectedDate, setSelectedDate] = useState(state.reportDate);//new Date("2023-06-01");//.toLocaleDateString('en-US'));
+    const [selectedDate, setSelectedDate] = useState(state.reportDate);
     const [loading, setLoading] = useState(false);
     const [tableRows, setTableRows] = useState([]);
     const handleDateChange = (date) => {
-        console.log("date:"+date);
+        console.log("date:" + date);
         setSelectedDate(date);
     };
     console.log(state.teamLeaderName);
@@ -59,7 +58,7 @@ export default function TableData() {
     useEffect(() => {
         (
             async () => {
-                setLoading(true);            
+                setLoading(true);
                 await fetchData();
                 console.log(apiKey);
             })();
@@ -81,7 +80,7 @@ export default function TableData() {
     useEffect(() => {
         (
             async () => {
-                console.log("selectedDate: "+ selectedDate);
+                console.log("selectedDate: " + selectedDate);
                 if (apiKey != "") {
                     setLoading(true);
                     console.log("before loadTeamData:" + apiKey);
@@ -101,7 +100,7 @@ export default function TableData() {
                     presence_options = Object.entries(settingsJson.labels).map(([key, value]) => ({
                         id: key,
                         label: value
-                    })).sort((a, b) => optPosVal[a.id] - optPosVal[b.id]);//set options position as in monday
+                    })).sort((a, b) => optPosVal[a.id] - optPosVal[b.id]);
                     console.log(presence_options);
                 }
                 console.log(JSON.stringify(resJson, null, 2));
@@ -185,98 +184,79 @@ export default function TableData() {
                 <h1>דוח הגעה שני ורביעי</h1>
             </div>
             <h2>{state.teamLeaderName}</h2>
-            <LocalizationProvider dateAdapter={AdapterDayjs}> 
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={['DatePicker']}>
                     <DatePicker
                         className="dateCheck"
                         onChange={handleDateChange}
-                        label='תאריך דו"ח' 
-                        defaultValue={dayjs(selectedDate)}   
+                        label='תאריך דו"ח'
+                        defaultValue={dayjs(selectedDate)}
                     />
-               </DemoContainer>
+                </DemoContainer>
             </LocalizationProvider>
             {loading ? <BoxLoading /> :
-            <div><TableContainer component={Paper} className='table'>
-                <Table dir="rtl" sx={{ minWidth: 50 }} aria-label="simple table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell align="right">שם</TableCell>
-                            <TableCell align="center">נוכחות</TableCell>
-                            <TableCell className='three' align="center">סיבת חיסור/הערות</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {tableRows.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
-                                <TableCell align="right" component="th" scope="row">
-                                    {row.name}
-                                </TableCell>
-                                <TableCell align="center">                                    
-                                    {/* <Select
-                                        sx={{ width: 160 }}
-                                        label="נוכחות"
-                                        defaultValue={row.presence}
-                                        onChange={(e) => {
-                                            const newValue = e.target.value;
-                                            console.log(newValue);
-                                            row.presence = newValue;
-                                            row.dirty = true;
-                                        }}
-                                        display= "true"
-                                    >
-                                        {presence_options.map((option) => (
-                                            <MenuItem key={option.id} value={option.label}>
-                                                {option.label}
-                                            </MenuItem>
-                                        ))}
-                                    </Select> */}
-                                     <FormControl fullWidth>
-                                        <InputLabel id="demo-simple-select-label">נוכחות</InputLabel>
-                                        <Select
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
-                                            label="נוכחות"
-                                            defaultValue={row.presence}
-                                            onChange={(e) => {
+                <div><TableContainer component={Paper} className='table'>
+                    <Table dir="rtl" sx={{ minWidth: 50 }} aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="right">שם</TableCell>
+                                <TableCell align="center">נוכחות</TableCell>
+                                <TableCell className='three' align="center">סיבת חיסור/הערות</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {tableRows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                >
+                                    <TableCell align="right" component="th" scope="row">
+                                        {row.name}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <FormControl fullWidth>
+                                            <InputLabel id="demo-simple-select-label">נוכחות</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-label"
+                                                id="demo-simple-select"
+                                                label="נוכחות"
+                                                defaultValue={row.presence}
+                                                onChange={(e) => {
+                                                    const newValue = e.target.value;
+                                                    console.log(newValue);
+                                                    row.presence = newValue;
+                                                    row.dirty = true;
+                                                }}
+                                            >
+                                                {presence_options.map((option) => (
+                                                    <MenuItem key={option.id} value={option.label}>
+                                                        {option.label}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </TableCell>
+                                    <TableCell align="center" scope="row">
+                                        <TextField
+                                            sx={{ width: 300 }}
+                                            label="סיבת חיסור/הערות" variant="standard"
+                                            defaultValue={row.absenceReason}
+                                            onBlur={(e) => {
                                                 const newValue = e.target.value;
                                                 console.log(newValue);
-                                                row.presence = newValue;
+                                                row.absenceReason = newValue;
                                                 row.dirty = true;
                                             }}
                                         >
-                                            {presence_options.map((option) => (
-                                                <MenuItem key={option.id} value={option.label}>
-                                                    {option.label}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-
-                                </TableCell>
-                                <TableCell align="center" scope="row">
-                                    <TextField
-                                        sx={{ width: 300 }}
-                                        label="סיבת חיסור/הערות" variant="standard"
-                                        defaultValue={row.absenceReason}
-                                        onBlur={(e) => {
-                                            const newValue = e.target.value;
-                                            console.log(newValue);
-                                            row.absenceReason = newValue;
-                                            row.dirty = true;
-                                        }}
-                                    >
-                                    </TextField>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>            
-            <Button className='toSend' onClick={save} variant="contained">שמירה</Button>
-            </div>}
+                                        </TextField>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                    <Button className='toSend' onClick={save} variant="contained">שמירה</Button>
+                </div>}
         </div>
     );
 }

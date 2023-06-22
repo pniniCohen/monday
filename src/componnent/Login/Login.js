@@ -53,8 +53,7 @@ const Login = () => {
       requestMonday(query)
         .then(resJson => {
           console.log(JSON.stringify(resJson, null, 2));
-          if (//temp removed : resJson.data.items_by_column_values.some(x => x.column_values.some(y=> y.id=="text0" && y.text== id)) &&
-            resJson.data.items_by_column_values.some(x => x.column_values.some(y => y.id == "__" && (y.text == "רכזת" || y.text == "ראש צוות"))))//;
+          if (resJson.data.items_by_column_values.some(x => x.column_values.some(y => y.id == "__" && (y.text == "רכזת" || y.text == "ראש צוות"))))
           {
             navigate('/tableData', { state: { teamLeaderName: resJson.data.items_by_column_values[0].name, reportDate: reportDate } });
           }
@@ -84,6 +83,13 @@ const Login = () => {
     console.log(date);
     setReportDate(new Date(date));
   };
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {      
+      console.log('Enter key pressed!');
+      handleClick();
+    }
+  };
+
 
   return (
     <div>
@@ -94,14 +100,13 @@ const Login = () => {
             defaultValue={dayjs(reportDate)}
             onChange={handleDateChange}
             value={dayjs(reportDate)}
-            // startDate={reportDate}
             label='תאריך דו"ח'
           />
         </DemoContainer>
       </LocalizationProvider>
-      <TextField className='text' id="outlined-basic" label="מספר עובדת" variant="outlined" onChange={(e) => { setEmployeeNumber(e.target.value) }} />
+      <TextField className='text' id="outlined-basic" label="מספר עובדת" autoFocus variant="outlined" onChange={(e) => { setEmployeeNumber(e.target.value) }} />
       <br></br>
-      <TextField className='text' id="outlined-basic" label="תז" variant="outlined" onChange={(e) => { setId(e.target.value) }} />
+      <TextField className='text' id="outlined-basic" label="תז" variant="outlined" onChange={(e) => { setId(e.target.value) }} onKeyPress={handleKeyPress} />
       <br></br>
       <Button className='login' onClick={handleClick} variant="contained">התחברות</Button>
     </div>
