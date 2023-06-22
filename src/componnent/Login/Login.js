@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
-import TableData from '../TableData/TableData';
 import './Login.css';
 import Button from '@mui/material/Button';
-import { Await, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -38,9 +37,10 @@ const Login = () => {
     fetchData();
     const urlParams = new URLSearchParams(window.location.search);
     const dateParam = urlParams.get('reportDate');
-    if (dateParam) 
-    setReportDate(dateParam);
-  }, []);
+    if (dateParam)
+      setReportDate(dateParam);
+      // eslint-disable-next-line
+  },[]);
 
   const handleClick = () => {
     if (employeeNumber.trim() === '' || id.trim() === '') {
@@ -53,7 +53,8 @@ const Login = () => {
       requestMonday(query)
         .then(resJson => {
           console.log(JSON.stringify(resJson, null, 2));
-          if (resJson.data.items_by_column_values.some(x => x.column_values.some(y => y.id == "__" && (y.text == "רכזת" || y.text == "ראש צוות"))))
+          if (//temp removed : resJson.data.items_by_column_values.some(x => x.column_values.some(y=> y.id ==="text0" && y.text === id)) &&
+            resJson.data.items_by_column_values.some(x => x.column_values.some(y => y.id === "__" && (y.text === "רכזת" || y.text === "ראש צוות"))))//;
           {
             navigate('/tableData', { state: { teamLeaderName: resJson.data.items_by_column_values[0].name, reportDate: reportDate } });
           }
@@ -93,7 +94,7 @@ const Login = () => {
 
   return (
     <div>
-      <LocalizationProvider  dateAdapter={AdapterDayjs}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DemoContainer components={['DatePicker']}>
           <DatePicker
             className="dateCheck"
@@ -108,7 +109,7 @@ const Login = () => {
       <br></br>
       <TextField className='text' id="outlined-basic" label="תז" variant="outlined" onChange={(e) => { setId(e.target.value) }} onKeyPress={handleKeyPress} />
       <br></br>
-      <Button className='login' onClick={handleClick} variant="contained">התחברות</Button>
+     <Button className='login' onClick={handleClick} variant="contained">התחברות</Button>
     </div>
   );
 };
