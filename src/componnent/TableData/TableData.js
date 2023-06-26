@@ -218,7 +218,7 @@ export default function TableData() {
                                         {row.name}
                                     </TableCell>
                                     <TableCell align="center">
-                                        <FormControl fullWidth>
+                                        <FormControl fullWidth sx={{ minWidth: 100 }}>
                                             <InputLabel id="demo-simple-select-label">נוכחות</InputLabel>
                                             <Select
                                                 labelId="demo-simple-select-label"
@@ -241,8 +241,8 @@ export default function TableData() {
                                         </FormControl>
                                     </TableCell>
                                     <TableCell align="center" scope="row">
-                                        <TextField
-                                            sx={{ width: 300 }}
+                                        <TextField fullWidth
+                                            sx={{ minWidth: 200 }}
                                             label="סיבת חיסור/הערות" variant="standard"
                                             defaultValue={row.absenceReason}
                                             onBlur={(e) => {

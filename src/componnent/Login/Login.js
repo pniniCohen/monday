@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TextField from '@mui/material/TextField';
-import './Login.css';
+import TableData from '../TableData/TableData.js';
 import Button from '@mui/material/Button';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
@@ -8,6 +8,7 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import './Login.css';
 import dayjs from "dayjs";
 
 
@@ -16,69 +17,38 @@ const Login = () => {
   const navigate = useNavigate();
   const [employeeNumber, setEmployeeNumber] = useState('');
   const [id, setId] = useState('');
-  const [apiKey, setApiKey] = useState('');
   const [reportDate, setReportDate] = useState(new Date());
 
-
-
-  const fetchData = async () => {
-    try {
-      const response = await axios.get('http://localhost:3001/key');
-      console.log(response.data);
-      console.log("get Api key!");
-      setApiKey(response.data);
-      console.log(apiKey)
-    } catch (error) {
-      console.error("Error getting Data:", error.message);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
     const urlParams = new URLSearchParams(window.location.search);
     const dateParam = urlParams.get('reportDate');
     if (dateParam)
       setReportDate(dateParam);
       // eslint-disable-next-line
   },[]);
+  
+  const employee = {
+    id,
+    employeeNumber,
+  };
 
   const handleClick = () => {
     if (employeeNumber.trim() === '' || id.trim() === '') {
       alert('יש למלא את כל השדות');
+      
     }
     else {
-      console.log(employeeNumber);
-      const query = '{items_by_column_values(board_id:1493172994,column_id:"text82",column_value:"' + employeeNumber + '" ){id,name column_values(ids:[text0, __]){id text}}}';
-      console.log(query);
-      requestMonday(query)
-        .then(resJson => {
-          console.log(JSON.stringify(resJson, null, 2));
-          if (//temp removed : resJson.data.items_by_column_values.some(x => x.column_values.some(y=> y.id ==="text0" && y.text === id)) &&
-            resJson.data.items_by_column_values.some(x => x.column_values.some(y => y.id === "__" && (y.text === "רכזת" || y.text === "ראש צוות"))))//;
-          {
-            navigate('/tableData', { state: { teamLeaderName: resJson.data.items_by_column_values[0].name, reportDate: reportDate } });
-          }
-          else {
-            alert('לא נמצאו נתונים מתאימים');
-            return
-          }
-        });
-    }
-  }
-
-  const requestMonday = async (query) => {
-    return fetch("https://api.monday.com/v2", {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': apiKey
-      },
-      body: JSON.stringify({
-        'query': query
+      axios.post('http://localhost:3001/employeeNumber', employee)
+        .then(res =>{ if(res.data.logged)
+        {
+          navigate('/tableData', { state: { teamLeaderName: res.data.employeeName, reportDate: reportDate } });
+        } console.log(res);
       })
-    })
-      .then(res => res.json())
-  };
+      .catch(err => {
+        console.error(err);
+      });
+    };
+  }
 
   const handleDateChange = (date) => {
     console.log(date);
@@ -91,12 +61,12 @@ const Login = () => {
     }
   };
 
-
   return (
     <div>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DemoContainer components={['DatePicker']}>
+        <DemoContainer components={['DatePicker']} >
           <DatePicker
+           id="outlined-basic"
             className="dateCheck"
             defaultValue={dayjs(reportDate)}
             onChange={handleDateChange}
