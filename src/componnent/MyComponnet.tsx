@@ -19,6 +19,5 @@ const MyComponnet = () => {
 };
 
 
-
-
 export default MyComponnet;
+

@@ -25,7 +25,7 @@ import FormControl from '@mui/material/FormControl';
 
 const imageUrl = process.env.PUBLIC_URL + '/irox.png';
 const absenceBoard = 4641194243;
-let presence_options = [];
+let presence_options:any[] = [];
 
 export default function TableData() {
 
@@ -33,7 +33,7 @@ export default function TableData() {
     const [selectedDate, setSelectedDate] = useState(state.reportDate);
     const [loading, setLoading] = useState(false);
     const [tableRows, setTableRows] = useState([]);
-    const handleDateChange = (date) => {
+    const handleDateChange = (date:any) => {
         console.log("date:" + date);
         setSelectedDate(date);
     };
@@ -48,7 +48,7 @@ export default function TableData() {
             console.log("get Api key!");
             setApiKey(response.data);
             console.log(apiKey)
-        } catch (error) {
+        } catch (error:any) {
             console.error("Error getting Data:", error.message);
         }
     };
@@ -68,7 +68,7 @@ export default function TableData() {
             async () => {
                 if (apiKey !== '') {
                     setLoading(true);
-                    await loadPresenceOptions();
+                    // await loadPresenceOptions();
                     console.log(presence_options);
                     if (selectedDate !== null)
                         loadTeamData();
@@ -91,24 +91,24 @@ export default function TableData() {
     }, [selectedDate]);
 
     //טעינת האופציות עבור שדה נוכחות
-    const loadPresenceOptions = async () => {
-        const query = '{ boards (ids:' + absenceBoard + ') { columns(ids:[status]) { title settings_str } } }'
-        console.log("!!loadPresenceOptions query:" + query);
-        requestMonday(query)
-            .then(resJson => {
-                if (resJson.data !== undefined) {
-                    let settingsJson = JSON.parse(resJson.data.boards[0].columns[0].settings_str);
-                    let optPosVal = Object.values(settingsJson.labels_positions_v2);
-                    presence_options = Object.entries(settingsJson.labels).map(([key, value]) => ({
-                        id: key,
-                        label: value
-                    })).sort((a, b) => optPosVal[a.id] - optPosVal[b.id]);
-                    console.log(presence_options);
-                }
-                console.log(JSON.stringify(resJson, null, 2));
-                return resJson;
-            })
-    };
+    // const loadPresenceOptions = async () => {
+    //     const query = '{ boards (ids:' + absenceBoard + ') { columns(ids:[status]) { title settings_str } } }'
+    //     console.log("!!loadPresenceOptions query:" + query);
+    //     requestMonday(query)
+    //         .then(resJson => {
+    //             if (resJson.data !== undefined) {
+    //                 let settingsJson = JSON.parse(resJson.data.boards[0].columns[0].settings_str);
+    //                 let optPosVal = Object.values(settingsJson.labels_positions_v2);
+    //                 presence_options = Object.entries(settingsJson.labels).map(([key, value]) => ({
+    //                     id: key,
+    //                     label: value
+    //                 })).sort((a, b) => optPosVal[a.id] - optPosVal[b.id]);
+    //                 console.log(presence_options);
+    //             }
+    //             console.log(JSON.stringify(resJson, null, 2));
+    //             return resJson;
+    //         })
+    // };
 
     //טעינת רשומות הצוות לתאריך הנבחר
     const loadTeamData = () => {
@@ -117,12 +117,12 @@ export default function TableData() {
         requestMonday(query)
             .then(resJson => {
                 if (resJson.data !== undefined) {
-                    let filteredRows = resJson.data.items_by_column_values.filter(x => x.column_values.some(y => y.id === "dropdown" && y.text === state.teamLeaderName));
-                    setTableRows(filteredRows.map((row) => ({
+                    let filteredRows = resJson.data.items_by_column_values.filter((x: { column_values: any[]; }) => x.column_values.some((y: { id: string; text: any; }) => y.id === "dropdown" && y.text === state.teamLeaderName));
+                    setTableRows(filteredRows.map((row:any) => ({
                         id: row.id
-                        , name: row.column_values.filter(a => a.id === "dropdown9")[0].text
-                        , presence: row.column_values.filter(a => a.id === "status")[0].text
-                        , absenceReason: row.column_values.filter(a => a.id === "text")[0].text
+                        , name: row.column_values.filter((a: { id: string; }) => a.id === "dropdown9")[0].text
+                        , presence: row.column_values.filter((a: { id: string; }) => a.id === "status")[0].text
+                        , absenceReason: row.column_values.filter((a: { id: string; }) => a.id === "text")[0].text
                         , dirty: false
                     })));
                     setLoading(false);
@@ -137,7 +137,7 @@ export default function TableData() {
         // });
     };
 
-    const getFormattedDate = (date) => {
+    const getFormattedDate = (date: string | number | Date) => {
         return new Date(date).toLocaleDateString('en-GB', {
             year: 'numeric',
             month: '2-digit',
@@ -145,7 +145,7 @@ export default function TableData() {
         }).split('/').reverse().join('-');
     }
 
-    const requestMonday = async (query) => {
+    const requestMonday = async (query: string) => {
         return fetch("https://api.monday.com/v2", {
             method: 'post',
             headers: {
@@ -165,7 +165,7 @@ export default function TableData() {
         console.log(JSON.stringify(tableRows, null, 2));
         const formattedToday = getFormattedDate(new Date());
         for (let index = 0; index < tableRows.length; index++) {
-            const row = tableRows[index];
+            const row:any = tableRows[index];
             if (row.dirty) {
                 const query = 'mutation{change_multiple_column_values(board_id:' + absenceBoard + ', item_id:' + row.id + ',column_values: "{\\"status\\": \\"' + row.presence + '\\", \\"text\\": \\"' + row.absenceReason + '\\",\\"date\\": \\"' + formattedToday + '\\" }" ) { id }}';
                 requestMonday(query)
@@ -209,7 +209,7 @@ export default function TableData() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {tableRows.map((row) => (
+                            {tableRows.map((row:any) => (
                                 <TableRow
                                     key={row.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -218,7 +218,7 @@ export default function TableData() {
                                         {row.name}
                                     </TableCell>
                                     <TableCell align="center">
-                                        <FormControl fullWidth>
+                                        <FormControl fullWidth sx={{ minWidth:100}}>
                                             <InputLabel id="demo-simple-select-label">נוכחות</InputLabel>
                                             <Select
                                                 labelId="demo-simple-select-label"
@@ -232,7 +232,7 @@ export default function TableData() {
                                                     row.dirty = true;
                                                 }}
                                             >
-                                                {presence_options.map((option) => (
+                                                {presence_options.map((option:any) => (
                                                     <MenuItem key={option.id} value={option.label}>
                                                         {option.label}
                                                     </MenuItem>
