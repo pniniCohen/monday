@@ -43,7 +43,9 @@ export default function TableData() {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:3001/key');
+            axios.defaults.headers.common['Authorization'] = localStorage.getItem("access_token");
+
+            const response = await axios.get('http://localhost/MondayWebAPI/api/Monday/loadPresenceOptions');
             console.log(response.data);
             console.log("get Api key!");
             setApiKey(response.data);
@@ -90,25 +92,6 @@ export default function TableData() {
         // eslint-disable-next-line
     }, [selectedDate]);
 
-    //טעינת האופציות עבור שדה נוכחות
-    // const loadPresenceOptions = async () => {
-    //     const query = '{ boards (ids:' + absenceBoard + ') { columns(ids:[status]) { title settings_str } } }'
-    //     console.log("!!loadPresenceOptions query:" + query);
-    //     requestMonday(query)
-    //         .then(resJson => {
-    //             if (resJson.data !== undefined) {
-    //                 let settingsJson = JSON.parse(resJson.data.boards[0].columns[0].settings_str);
-    //                 let optPosVal = Object.values(settingsJson.labels_positions_v2);
-    //                 presence_options = Object.entries(settingsJson.labels).map(([key, value]) => ({
-    //                     id: key,
-    //                     label: value
-    //                 })).sort((a, b) => optPosVal[a.id] - optPosVal[b.id]);
-    //                 console.log(presence_options);
-    //             }
-    //             console.log(JSON.stringify(resJson, null, 2));
-    //             return resJson;
-    //         })
-    // };
 
     //טעינת רשומות הצוות לתאריך הנבחר
     const loadTeamData = () => {
@@ -116,20 +99,20 @@ export default function TableData() {
         console.log("query:" + query);
         requestMonday(query)
             .then(resJson => {
-                if (resJson.data !== undefined) {
-                    let filteredRows = resJson.data.items_by_column_values.filter((x: { column_values: any[]; }) => x.column_values.some((y: { id: string; text: any; }) => y.id === "dropdown" && y.text === state.teamLeaderName));
-                    setTableRows(filteredRows.map((row:any) => ({
-                        id: row.id
-                        , name: row.column_values.filter((a: { id: string; }) => a.id === "dropdown9")[0].text
-                        , presence: row.column_values.filter((a: { id: string; }) => a.id === "status")[0].text
-                        , absenceReason: row.column_values.filter((a: { id: string; }) => a.id === "text")[0].text
-                        , dirty: false
-                    })));
-                    setLoading(false);
-                }
-                else {
-                    setTableRows([]);
-                }
+                // if (resJson.data !== undefined) {
+                //     let filteredRows = resJson.data.items_by_column_values.filter((x: { column_values: any[]; }) => x.column_values.some((y: { id: string; text: any; }) => y.id === "dropdown" && y.text === state.teamLeaderName));
+                //     setTableRows(filteredRows.map((row:any) => ({
+                //         id: row.id
+                //         , name: row.column_values.filter((a: { id: string; }) => a.id === "dropdown9")[0].text
+                //         , presence: row.column_values.filter((a: { id: string; }) => a.id === "status")[0].text
+                //         , absenceReason: row.column_values.filter((a: { id: string; }) => a.id === "text")[0].text
+                //         , dirty: false
+                //     })));
+                //     setLoading(false);
+                // }
+                // else {
+                //     setTableRows([]);
+                // }
             })
         // .then(resJson => {
         //     console.log(JSON.stringify(resJson, null, 2));
@@ -146,17 +129,17 @@ export default function TableData() {
     }
 
     const requestMonday = async (query: string) => {
-        return fetch("https://api.monday.com/v2", {
-            method: 'post',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': apiKey
-            },
-            body: JSON.stringify({
-                'query': query
-            })
-        })
-            .then(res => res.json())
+        // return fetch("https://api.monday.com/v2", {
+        //     method: 'post',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'Authorization': apiKey
+        //     },
+        //     body: JSON.stringify({
+        //         'query': query
+        //     })
+        // })
+        //     .then(res => res.json())
     };
 
     //שמירת הרשומות שנעשה בהן שינוי ל Monday
