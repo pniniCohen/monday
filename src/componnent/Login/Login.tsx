@@ -17,7 +17,6 @@ const Login = () => {
   const regex = /^\d*$/;
   const [employeeNumber, setEmployeeNumber] = useState('');
   const [id, setId] = useState('');
-  const [apiKey, setApiKey] = useState('');
   const [reportDate, setReportDate] = useState(new Date());
   const [errorNumber, setErrorNumber] = useState(false);
   const [errorId, setErrorId] = useState(false);
@@ -38,7 +37,6 @@ const Login = () => {
 
 
   useEffect(() => {
-    fetchData();
     const urlParams = new URLSearchParams(window.location.search);
     const dateParam = urlParams.get('reportDate');
 
@@ -48,7 +46,7 @@ const Login = () => {
     }
     // eslint-disable-next-line
   }, []);
-
+  
   const handleClick = async () => {
     if (employeeNumber.trim() === '' || id.trim() === '') {
       alert('יש למלא את כל השדות');
@@ -67,6 +65,7 @@ const Login = () => {
       } catch (error) {
         alert(error);
         console.error(error);
+      }
       }
     };
 
@@ -91,43 +90,17 @@ const Login = () => {
     console.log(date);
     setReportDate(new Date(date));
   };
-
-  const handleInputNumChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const input = event.target.value;
-
-    if (!regex.test(input)) {
-      setErrorNumber(true);
-    }
-    else {
-      setErrorNumber(false);
-      setEmployeeNumber(input);
-    }
-  };
-
-  const handleInputIdChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const input = event.target.value;
-
-    if (!regex.test(input)) {
-      setErrorId(true);
-    }
-    else {
-      setErrorId(false);
-      setId(input);
-    }
-  };
-
-  const handleKeyPress = (event: any) => {
-    if (event.key === 'Enter') {
+  const handleKeyPress = (event:any) => {
+    if (event.key === 'Enter') {      
       console.log('Enter key pressed!');
       handleClick();
     }
   };
 
-
   return (
     <div>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DemoContainer components={['DatePicker']}>
+        <DemoContainer components={['DatePicker']} >
           <DatePicker
             className="dateCheck"
             defaultValue={dayjs(reportDate)}
@@ -144,8 +117,10 @@ const Login = () => {
       {errorId && <p style={{ color: 'red' }}>קלט לא חוקי: ת"ז מכילה רק מספרים</p>}
       <br></br>
       <Button className='login' onClick={handleClick} variant="contained">התחברות</Button>
+      <Button className='login' onClick={handleClick} variant="contained">התחברות</Button>
     </div>
   );
 };
 
 export default Login;
+
