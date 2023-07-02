@@ -21,7 +21,9 @@ import dayjs from "dayjs";
 import { BoxLoading } from 'react-loadingg';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
-
+import { useNavigate } from 'react-router-dom';
+import store from '../../redux/store';
+import { decrement } from '../../redux/action';
 
 const imageUrl = process.env.PUBLIC_URL + '/irox.png';
 const absenceBoard = 4641194243;
@@ -29,17 +31,18 @@ let presence_options:any[] = [];
 
 export default function TableData() {
 
+    const navigate = useNavigate();
     const { state } = useLocation();
     const [selectedDate, setSelectedDate] = useState(state.reportDate);
     const [loading, setLoading] = useState(false);
     const [tableRows, setTableRows] = useState([]);
+    const [apiKey, setApiKey] = useState('');
+
     const handleDateChange = (date:any) => {
         console.log("date:" + date);
         setSelectedDate(date);
     };
-    console.log(state.teamLeaderName);
 
-    const [apiKey, setApiKey] = useState('');
 
     const fetchData = async () => {
         try {
@@ -52,6 +55,22 @@ export default function TableData() {
             console.error("Error getting Data:", error.message);
         }
     };
+
+    useEffect(() => {
+      const intervalId = setInterval(() => {
+        store.dispatch(decrement());
+        console.log("set interval every 1 minute");
+        const count = store.getState().counter;
+        console.log(count);
+        if (count === 0) {
+          navigate('/login');
+        }
+      }, 60000);
+  
+      return () => {
+        clearInterval(intervalId); // Cleanup the interval on component unmount
+      };
+    },[]);
 
     useEffect(() => {
         (
