@@ -1,0 +1,21 @@
+.dateCheck{
+    display: block;
+    width: 100%;
+    color:tomato;
+} /* text-align: center !important;
+    margin:auto !important;
+    width: 12%; */
+.react-datepicker-wrapper,
+.react-datepicker__input-container,
+.react-datepicker__input-container input {
+    display: block;
+    width: 100%;
+}
+
+.text{
+    margin-top: 3% !important;
+}
+
+.login{
+    margin-top: 3% !important;  
+}
