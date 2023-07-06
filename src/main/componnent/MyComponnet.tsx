@@ -1,4 +1,4 @@
-import React, { Component, Suspense, useEffect, useRef, useState } from "react";
+import { Component, Suspense } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import './MyComponnet.css';
 import Button from '@mui/material/Button';
@@ -16,6 +16,7 @@ class MyComponnet extends Component {
         this.setState({loggedOut:newValue});
   };
 
+  
     render() {
         return (
             <Suspense fallback={<div>Loading...</div>}>
@@ -32,7 +33,7 @@ class MyComponnet extends Component {
                         <div className="layout-main">
                             <Routes>
                                 <Route path="/login" element={<Login loggedOut={this.state.loggedOut} updateLoggedOut={this.updateLoggedOut}/>} />
-                                <Route path="/" element={<Login />} />
+                                <Route path="/" element={<Login loggedOut={this.state.loggedOut} updateLoggedOut={this.updateLoggedOut}/>} />
                                 <Route path="/tableData" element={<TableData />} />
                                 {/* <Route path="/" element={this.state.token ? <Navigate to="/tableData" /> : <Login/>} /> */}
                             </Routes>
@@ -50,12 +51,12 @@ export default MyComponnet;
 export const LogoutButton = (props:any) => {
 
     const logout = () => {
-        localStorage.removeItem("access_token")
+        localStorage.removeItem("access_token")        
+        new authService().logout()
         props.updateLoggedOut(true)
     };
 
     if (props.loggedOut) { 
-        new authService().logout();
         return <Navigate replace to="/login" />
     }
 
