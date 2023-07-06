@@ -16,10 +16,8 @@ export default class tableDataService extends ApiCore {
         return apiProvider.get(`Monday/loadPresenceOptions`);
     }
     
-
-    //todo:
-    public save(driveInfo: object) {
-        return apiProvider.put(`driveConfig`, driveInfo )
+    public update(rows: object) {
+        return apiProvider.post(`Monday/updatePresenceRows`, rows )
     }
   
 };
