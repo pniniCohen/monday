@@ -1,10 +1,13 @@
-.dateCheck{
+.dateChoose{
     display: block;
-    width: 100%;
     color:tomato;
-} /* text-align: center !important;
-    margin:auto !important;
-    width: 12%; */
+    text-align: center !important;
+    width: 12%;
+    /* margin-left: 20% !important; */
+    margin-bottom: 2% !important;
+    margin: auto !important;
+
+} 
 .react-datepicker-wrapper,
 .react-datepicker__input-container,
 .react-datepicker__input-container input {

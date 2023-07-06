@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import Login from './Login/Login';
 import TableData from './TableData/TableData';
 import authService from "../services/auth.service";
+import { red } from "@mui/material/colors";
 const imageUrl = process.env.PUBLIC_URL + '/irox.png';
 
 
@@ -23,7 +24,6 @@ class MyComponnet extends Component {
                     <div style={{ display: "flex" }}>
                         <LogoutButton loggedOut={this.state.loggedOut} updateLoggedOut={this.updateLoggedOut}/>
                     </div>
-                    <br />
                     <div>
                         <img src={imageUrl} alt={`תמונה `} />
                         <h2>דוח שני ורביעי</h2>
@@ -32,7 +32,7 @@ class MyComponnet extends Component {
                         <div className="layout-main">
                             <Routes>
                                 <Route path="/login" element={<Login loggedOut={this.state.loggedOut} updateLoggedOut={this.updateLoggedOut}/>} />
-                                <Route path="/" element={<Login />} />
+                                <Route path="/" element={<Login loggedOut={this.state.loggedOut} updateLoggedOut={this.updateLoggedOut}/>} />
                                 <Route path="/tableData" element={<TableData />} />
                                 {/* <Route path="/" element={this.state.token ? <Navigate to="/tableData" /> : <Login/>} /> */}
                             </Routes>
@@ -59,7 +59,8 @@ export const LogoutButton = (props:any) => {
         return <Navigate replace to="/login" />
     }
 
-    return <Button onClick={logout}>LogOut</Button>;
+    return <Button  style={{ border: '1px solid red',marginLeft:"75%"}} onClick={logout}>LogOut</Button>;
+    
 };
 
 

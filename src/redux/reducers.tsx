@@ -15,8 +15,6 @@ const rootReducer = (state = initialState, action: any) => {
                 ...state,
                 counter: state.counter > 0 ? state.counter - 1 : 0
             };
-        // case 'GETCOUNTER':
-        //     return state;
         default:
             return state;
     }
