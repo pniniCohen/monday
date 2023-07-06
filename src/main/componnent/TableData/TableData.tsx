@@ -15,7 +15,7 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-//import axios from 'axios';
+import axios from 'axios';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import dayjs from "dayjs";
@@ -38,7 +38,6 @@ export default function TableData() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [loading, setLoading] = useState(false);
     const [tableRows, setTableRows] = useState([]);
-    //const [apiKey, setApiKey] = useState('');
     const [expire_time, setExpire_time] = useState(0);
 
     const handleDateChange = (date:any) => {
@@ -52,7 +51,6 @@ export default function TableData() {
             setExpire_time(Number(localStorage.getItem("expire_time")));
             const response = await new tableDataService().loadPresenceOptions();
             if (response.errorMessage) {
-                //temp
                 alert(response.errorMessage);
                 //messageRef.current?.show(MessageSeverity.error, t('message.error'), response.errorMessage);
             }
@@ -66,6 +64,28 @@ export default function TableData() {
             console.error("Error getting Data:", error.message);
         }
     };
+
+    const loadEmployeesByTeamAndDate = async () => {
+
+        try {
+            axios.defaults.headers.common['Authorization'] = localStorage.getItem("access_token");
+            // const response = await axios.get('http://localhost/MondayWebAPI/api/Monday/GetEmployeesByTeamLeadersNameAndDate',{ params: {selectedDate}});
+             const response = await new tableDataService().getTeamData(selectedDate);
+            console.log(response);
+            setTableRows(response.map((row: any) => ({
+                id: row.employeeName
+                , name: row.employeeName
+                , presence: row.statusPresent
+                , absenceReason: row.reason
+                , dirty: false
+            })));
+            console.log(tableRows[0]);
+            setLoading(false);
+        } catch (error: any) {
+            console.error("Error getting Data:", error.message);
+        }
+    };
+
 
     // useEffect(() => {
     //   const intervalId = setInterval(() => {
@@ -88,7 +108,7 @@ export default function TableData() {
             async () => {
                 setLoading(true);
                 await fetchData();
-                //console.log(apiKey);
+                loadEmployeesByTeamAndDate();
             })();
         // eslint-disable-next-line
     }, []);
@@ -97,42 +117,14 @@ export default function TableData() {
         (
             async () => {
                 console.log("selectedDate: "+ selectedDate);
-                //if (apiKey !== "") {
                     setLoading(true);
-                    //console.log("before loadTeamData:" + apiKey);
-                    loadTeamData();
-                //}
+                    // loadTeamData();
+                    loadEmployeesByTeamAndDate();
             })();
         // eslint-disable-next-line
     }, [selectedDate]);
 
 
-    //טעינת רשומות הצוות לתאריך הנבחר
-    const loadTeamData = () => {
-        //const query = '{ items_by_column_values(board_id:' + absenceBoard + ', column_id: date4, column_value:"' + getFormattedDate(selectedDate) + '") {id column_values { id  text } } }';//title value
-        //console.log("query:" + query);
-        //requestMonday(query)
-        //    .then(resJson => {
-                // if (resJson.data !== undefined) {
-                //     let filteredRows = resJson.data.items_by_column_values.filter((x: { column_values: any[]; }) => x.column_values.some((y: { id: string; text: any; }) => y.id === "dropdown" && y.text === state.teamLeaderName));
-                //     setTableRows(filteredRows.map((row:any) => ({
-                //         id: row.id
-                //         , name: row.column_values.filter((a: { id: string; }) => a.id === "dropdown9")[0].text
-                //         , presence: row.column_values.filter((a: { id: string; }) => a.id === "status")[0].text
-                //         , absenceReason: row.column_values.filter((a: { id: string; }) => a.id === "text")[0].text
-                //         , dirty: false
-                //     })));
-                //     setLoading(false);
-                // }
-                // else {
-                //     setTableRows([]);
-                // }
-        //    })
-        // .then(resJson => {
-        //     console.log(JSON.stringify(resJson, null, 2));
-        //     setTableRows(resJson);
-        // });
-    };
 
     const getFormattedDate = (date: string | number | Date) => {
         return new Date(date).toLocaleDateString('en-GB', {
@@ -189,7 +181,7 @@ export default function TableData() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {tableRows.map((row:any) => (
+                                {tableRows && tableRows.map((row:any) => (
                                 <TableRow
                                     key={row.id}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -213,8 +205,8 @@ export default function TableData() {
                                                 }}
                                             >
                                                 {presence_options.map((option:any) => (
-                                                    <MenuItem key={option.id} value={option.label}>
-                                                        {option.label}
+                                                    <MenuItem key={option} value={option}>
+                                                        {option}
                                                     </MenuItem>
                                                 ))}
                                             </Select>

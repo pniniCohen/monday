@@ -7,13 +7,15 @@ export default class tableDataService extends ApiCore {
     }
        
     //todo
-    public getTeamData(teamLeaderName:string){
-        return apiProvider.post(`driveConfig/createDriveInfo?pn=${teamLeaderName}`,null);
+    public getTeamData(selectedDate:Date){
+        return apiProvider.getEmployees(`Monday/GetEmployeesByTeamLeadersNameAndDate`, selectedDate);
+
     }
 
     public loadPresenceOptions(){
         return apiProvider.get(`Monday/loadPresenceOptions`);
     }
+    
 
     //todo:
     public save(driveInfo: object) {

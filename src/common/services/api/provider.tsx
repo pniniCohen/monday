@@ -22,6 +22,15 @@ const get = (resource: string) => {
 };
 
 /** @param {string} resource */
+/** @param {Date} date */
+const getEmployees = (resource: string,date:Date) => {
+  return axios
+    .get(`${BASE_URL}/${resource}`,{params:{date}})
+    .then(handleResponse)
+    .catch(handleError);
+};
+
+/** @param {string} resource */
 /** @param {string} id */
 const getSingle = (resource: string, id: string) => {
   return axios
@@ -69,6 +78,7 @@ const remove = (resource: string, id: any) => {
 const apiProvider = {
   get,
   getAll,
+  getEmployees,
   getSingle,
   post,
   put,
