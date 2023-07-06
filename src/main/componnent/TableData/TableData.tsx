@@ -23,13 +23,8 @@ import { BoxLoading } from 'react-loadingg';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import presenceRowData from './presenceRowData';
-//import { useNavigate } from 'react-router-dom';
-//import authService from '../../services/auth.service';
-//import store from '../../redux/store';
-//import { decrement } from '../../redux/action';
+import { useNavigate } from 'react-router-dom';
 
-//const imageUrl = process.env.PUBLIC_URL + '/irox.png';
-//const absenceBoard = 4641194243;
 let presence_options: any[] = [];
 
 export default function TableData() {

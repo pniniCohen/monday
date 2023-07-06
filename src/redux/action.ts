@@ -10,9 +10,3 @@ export const decrement = () => {
     type: 'DECREMENT'
   };
 };
-
-// export const get = () => {
-//   return {
-//     type: 'GETCOUNTER'
-//   };
-// };

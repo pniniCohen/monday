@@ -29,6 +29,7 @@ const Login = (props:any) => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const dateParam = urlParams.get('reportDate');
+    props.updateLoggedOut(true);
 
     if (dateParam) {
       const parsedDate = new Date(dateParam);
@@ -108,7 +109,7 @@ const Login = (props:any) => {
         <LocalizationProvider dateAdapter={AdapterDayjs} >
           <DemoContainer components={['DatePicker']} >
             <DatePicker
-              className="dateCheck"
+              className="dateChoose"
               defaultValue={dayjs(reportDate)}
               onChange={handleDateChange}
               value={dayjs(reportDate)}
