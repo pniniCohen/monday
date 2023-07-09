@@ -12,7 +12,7 @@ const imageUrl = process.env.PUBLIC_URL + '/irox.png';
 
 class MyComponnet extends Component {
 
-    state = { loggedOut: true }
+    state = { loggedOut: false }
 
     componentDidMount() {
         axios.defaults.headers.common['Authorization'] = localStorage.getItem("access_token");
