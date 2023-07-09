@@ -152,7 +152,8 @@ export default function TableData() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {tableRows && tableRows.map((row: presenceRowData) => (
+                            {Array.isArray(tableRows)
+        ? tableRows.map((row: presenceRowData) => (
                                 <TableRow
                                     key={row.pulseId}
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -198,7 +199,7 @@ export default function TableData() {
                                         </TextField>
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )):null}
                         </TableBody>
                     </Table>
                 </TableContainer>

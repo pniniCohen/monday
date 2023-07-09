@@ -1,6 +1,6 @@
-import { redirect } from "react-router";
 
 export function handleResponse(response: any) {
+
   if (response.results) {
     return response.results;
   }
@@ -15,7 +15,8 @@ export function handleError(error: { data: any; response: any; }) {
   if (error.response.status) {
     console.log('error:' + error.response.status + ' ' + error.response.statusText);
     if (error.response.status === 401) {
-      return redirect('/login');
+       window.location.href = '/login';
+       return;
     }
   }
   if (error.data) {
@@ -23,3 +24,5 @@ export function handleError(error: { data: any; response: any; }) {
   }
   throw error;
 }
+
+
