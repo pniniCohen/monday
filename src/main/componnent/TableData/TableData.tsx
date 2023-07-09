@@ -63,7 +63,6 @@ export default function TableData() {
     const loadEmployeesByTeamAndDate = async () => {
 
         try {
-            axios.defaults.headers.common['Authorization'] = localStorage.getItem("access_token");
             const response = await new tableDataService().getTeamData(selectedDate);
             console.log(response);
             setTableRows(response);
