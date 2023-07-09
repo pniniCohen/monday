@@ -14,7 +14,7 @@ class MyComponnet extends Component {
 
     state = { loggedOut: false }
 
-    componentDidMount() {
+    componentWillMount() {
         axios.defaults.headers.common['Authorization'] = localStorage.getItem("access_token");
     };
 
