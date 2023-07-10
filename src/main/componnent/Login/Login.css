@@ -1,18 +1,11 @@
 .dateChoose{
-    display: block;
-    color:tomato;
     text-align: center !important;
-    width: 12%;
-    /* margin-left: 20% !important; */
     margin-bottom: 2% !important;
     margin: auto !important;
-
 } 
-.react-datepicker-wrapper,
-.react-datepicker__input-container,
-.react-datepicker__input-container input {
-    display: block;
-    width: 100%;
+
+.css-1xhypcz-MuiStack-root>.MuiTextField-root {
+    width: 225px;
 }
 
 .text{
